@@ -29,7 +29,7 @@ fn main() {
         color: colors::YELLOW
     };
 
-    let mut entities = vec![&npc];
+    let mut entities = vec![npc];
 
     let mut root = RootConsole::initializer()
         .font("arial10x10.png", FontLayout::Tcod)
@@ -40,13 +40,9 @@ fn main() {
 
     while !root.window_closed() {
         // Render the results
-        entities.push(&player);
+        entities.push(player);
         render_all(&mut root, &entities, screen_width, screen_height);
-        let mut pc = entities.pop();
-        player = match pc {
-            Some(p) => p.into_inner(),
-            None => panic!("Cannot locate player")
-        };
+        player = entities.pop().unwrap();
         root.flush();
         clear_all(&mut root, &entities);
 
@@ -65,6 +61,6 @@ fn main() {
             },
             _ => {}
         }
-        let mut player = &player.move_entity(displacement);
+        player.move_entity(displacement);
     }
 }

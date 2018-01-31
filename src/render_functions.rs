@@ -6,7 +6,7 @@ use entity::Entity;
 use tcod::console::BackgroundFlag;
 
 
-pub fn render_all(mut con: &Console, entities: &Vec<&Entity>,
+pub fn render_all(mut con: &Console, entities: &Vec<Entity>,
                   screen_width: i32, screen_height: i32) {
     let mut off_screen = Offscreen::new(screen_width, screen_height);
     for entity in entities {
@@ -23,7 +23,7 @@ fn draw_entity(mut con: &Console, entity: &Entity) {
 }
 
 
-pub fn clear_all(mut con: &Console, entities: &Vec<&Entity>) {
+pub fn clear_all(mut con: &Console, entities: &Vec<Entity>) {
     for entity in entities {
         clear_entity(&mut con, entity);
     }
