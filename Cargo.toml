@@ -1,0 +1,7 @@
+[package]
+name = "rl-tutorial"
+version = "0.1.0"
+authors = ["Panagiotis Koutsourakis <kutsurak@monetdbsolutions.com>"]
+
+[dependencies]
+tcod = "0.12.1"
