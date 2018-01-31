@@ -28,8 +28,8 @@ impl Rect {
     }
 
     pub fn center(&self) -> (i32, i32) {
-        let center_x = ((self.x_topleft + self.x_bottomright)/2); // as i32;
-        let center_y = ((self.y_topleft + self.y_bottomright)/2); // as i32;
+        let center_x = (self.x_topleft + self.x_bottomright)/2;
+        let center_y = (self.y_topleft + self.y_bottomright)/2;
 
         (center_x, center_y)
     }
@@ -80,7 +80,7 @@ impl GameMap {
         let mut num_rooms = 0;
         let mut rng = thread_rng();
 
-        for r in 1..max_rooms {
+        for _r in 1..max_rooms {
             let w = rng.gen_range(room_min_size, room_max_size);
             let h = rng.gen_range(room_min_size, room_max_size);
             let x = rng.gen_range(0, map_width - w - 1);
@@ -152,9 +152,11 @@ impl GameMap {
         }
     }
 
+    /*
     fn static_small_wall_filter(&self, x: i32, y: i32) -> bool {
         (x == 30 || x == 31 || x == 32) && y == 22
     }
+    */
 
     pub fn is_blocked(&self, x: i32, y: i32) -> bool {
         // NOTE: without this check the c library crashes.

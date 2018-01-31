@@ -17,6 +17,7 @@ impl Tile {
     }
 
 
+    /*
     pub fn new_with_sight(blocked: bool, block_sight: bool) -> Tile {
         let mut ret = Tile::default();
         ret.blocked = blocked;
@@ -24,4 +25,5 @@ impl Tile {
 
         ret
     }
+    */
 }
