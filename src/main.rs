@@ -6,14 +6,21 @@ use tcod::colors;
 mod input;
 mod entity;
 mod render_functions;
+mod map_objects;
 
 use input::{Action, handle_input};
 use entity::{Entity};
 use render_functions::{render_all, clear_all};
+use map_objects::game_map::GameMap;
 
 fn main() {
     let screen_width = 80;
     let screen_height = 50;
+    let map_width = 80;
+    let map_height = 45;
+
+    let colors = vec![colors::CYAN, colors::MAGENTA];
+    let game_map = GameMap::new(map_width, map_height);
 
     let mut player = Entity {
         x: screen_width/2,
@@ -41,7 +48,7 @@ fn main() {
     while !root.window_closed() {
         // Render the results
         entities.push(player);
-        render_all(&mut root, &entities, screen_width, screen_height);
+        render_all(&mut root, &entities, &game_map, screen_width, screen_height, &colors);
         player = entities.pop().unwrap();
         root.flush();
         clear_all(&mut root, &entities);
@@ -61,6 +68,8 @@ fn main() {
             },
             _ => {}
         }
-        player.move_entity(displacement);
+        if !game_map.is_blocked(player.x + displacement.0, player.y + displacement.1) {
+            player.move_entity(displacement);
+        }
     }
 }
