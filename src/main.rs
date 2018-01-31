@@ -1,4 +1,5 @@
 extern crate tcod;
+extern crate rand;
 
 use tcod::{RootConsole, FontLayout};
 use tcod::colors;
@@ -18,9 +19,14 @@ fn main() {
     let screen_height = 50;
     let map_width = 80;
     let map_height = 45;
+    let room_max_size = 10;
+    let room_min_size = 6;
+    let max_rooms = 30;
 
-    let colors = vec![colors::CYAN, colors::MAGENTA];
-    let game_map = GameMap::new(map_width, map_height);
+    let colors = vec![
+        colors::Color::new(0, 0, 100),
+        colors::Color::new(50, 50, 100)
+    ];
 
     let mut player = Entity {
         x: screen_width/2,
@@ -35,6 +41,9 @@ fn main() {
         ch: '@',
         color: colors::YELLOW
     };
+
+    let mut game_map = GameMap::new(map_width, map_height);
+    game_map.make_map(max_rooms, room_min_size, room_max_size, map_width, map_height, &mut player);
 
     let mut entities = vec![npc];
 
