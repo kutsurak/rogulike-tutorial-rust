@@ -28,7 +28,7 @@ impl GameMap {
 
                 t.x = x;
                 t.y = y;
-                if (x == 30 || x == 31 || x == 32) && y == 22 {
+                if self.static_small_wall_filter(x, y) {
                     t.blocked = true;
                     t.block_sight = true;
                 }
@@ -39,12 +39,17 @@ impl GameMap {
         v
     }
 
+    fn static_small_wall_filter(&self, x: i32, y: i32) -> bool {
+        (x == 30 || x == 31 || x == 32) && y == 22
+    }
+
     pub fn is_blocked(&self, x: i32, y: i32) -> bool {
-        let idx: usize = (x*self.height + y) as usize;
-        // NOTE: without this check it panics. Why?
-        if idx > self.tiles.len() {
-            return true
+        // NOTE: without this check the c library crashes.
+        if x < 0 || x >= self.width || y < 0 || y >= self.height {
+            return true;
         }
+        let idx: usize = (x*self.height + y) as usize;
+        println!("{}, {} => {} ?? {}", x, y, idx, self.tiles.len());
         self.tiles[idx].blocked
     }
 }
