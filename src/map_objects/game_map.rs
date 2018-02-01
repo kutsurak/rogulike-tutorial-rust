@@ -4,6 +4,8 @@ use std::vec::Vec;
 
 use rand::{thread_rng, Rng};
 
+use tcod::colors;
+
 use entity::Entity;
 use map_objects::tile::Tile;
 
@@ -74,7 +76,8 @@ impl GameMap {
     }
 
     pub fn make_map(&mut self, max_rooms: i32, room_min_size: i32, room_max_size: i32,
-                    map_width: i32, map_height: i32, player: &mut Entity) {
+                    map_width: i32, map_height: i32, player: &mut Entity,
+                    entities: &mut Vec<Entity>, max_monsters_per_room: i32) {
 
         let mut rooms = Vec::new();
         let mut num_rooms = 0;
@@ -116,6 +119,8 @@ impl GameMap {
                     }
                 }
 
+                self.place_entities(&new_room, entities, max_monsters_per_room);
+
                 rooms.push(new_room);
                 num_rooms += 1;
             }
@@ -140,6 +145,44 @@ impl GameMap {
             self.tiles[idx].blocked = false;
             self.tiles[idx].block_sight = false;
         }
+    }
+
+    fn place_entities(&mut self, room: &Rect, entities: &mut Vec<Entity>, max_monsters_per_room: i32) {
+        let num_of_monsters = thread_rng().gen_range(0, max_monsters_per_room);
+
+        for _i in 0..num_of_monsters {
+            let x = thread_rng().gen_range(room.x_topleft + 1, room.x_bottomright - 1);
+            let y = thread_rng().gen_range(room.y_topleft + 1, room.y_bottomright - 1);
+
+            let mut keep_position = true;
+            for entity in entities.iter() {
+                //println!("entity list iteration {:?}", entity);
+                if entity.x == x && entity.y == y {
+                    keep_position = false;
+                    break;
+                }
+            }
+
+            if keep_position {
+                let orc_or_troll = thread_rng().gen_range(0, 100);
+                let mut monster = Entity::default();
+                monster.x = x;
+                monster.y = y;
+                monster.blocks = true;
+                if orc_or_troll < 80 {
+                    monster.ch = 'o';
+                    monster.color = colors::DESATURATED_GREEN;
+                    monster.name = "Orc".to_string();
+                }
+                else {
+                    monster.ch = 'T';
+                    monster.color = colors::DARKER_GREEN;
+                    monster.name = "Troll".to_string();
+                }
+                entities.push(monster);
+            }
+        }
+
     }
 
     fn create_room(&mut self, room: &Rect) {

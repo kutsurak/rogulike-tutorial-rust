@@ -12,9 +12,10 @@ mod entity;
 mod map_objects;
 
 use engine::fov_functions::{initialize_fov, recompute_fov};
+use engine::game_states::GameStates;
 use engine::input::{Action, handle_input};
 use engine::render_functions::{render_all, clear_all};
-use entity::{Entity};
+use entity::{Entity, get_blocking_entities_at_location};
 use map_objects::game_map::GameMap;
 
 fn main() {
@@ -30,6 +31,8 @@ fn main() {
     let fov_light_walls = true;
     let fov_radius = 10;
 
+    let max_monsters_per_room = 3;
+
     let mut colors = HashMap::new();
 
     colors.insert(String::from("dark_wall"), colors::Color::new(0, 0, 100));
@@ -37,27 +40,18 @@ fn main() {
     colors.insert(String::from("light_wall"), colors::Color::new(130, 110, 50));
     colors.insert(String::from("light_ground"), colors::Color::new(200, 180, 50));
 
-    let mut player = Entity {
-        x: screen_width/2,
-        y: screen_height/2,
-        ch: '@',
-        color: colors::WHITE
-    };
+    let mut player = Entity::new(0, 0, '@', colors::WHITE,
+                                 "Player".to_string(), true);
 
-    let npc = Entity {
-        x: screen_width/2 - 5,
-        y: screen_height/2,
-        ch: '@',
-        color: colors::YELLOW
-    };
+    let mut entities = Vec::new();
 
     let mut game_map = GameMap::new(map_width, map_height);
-    game_map.make_map(max_rooms, room_min_size, room_max_size, map_width, map_height, &mut player);
+    game_map.make_map(max_rooms, room_min_size, room_max_size,
+                      map_width, map_height, &mut player,
+                      &mut entities, max_monsters_per_room);
 
     let mut fov_recompute = true;
     let mut fov_map = initialize_fov(&game_map);
-
-    let mut entities = vec![npc];
 
     let mut root = RootConsole::initializer()
         .font("arial10x10.png", FontLayout::Tcod)
@@ -66,6 +60,7 @@ fn main() {
         .fullscreen(false)
         .init();
 
+    let mut game_state = GameStates::PlayersTurn;
     while !root.window_closed() {
         // Render the results
         if fov_recompute {
@@ -86,19 +81,38 @@ fn main() {
         let action = handle_input(keypress);
 
         // Update the game state
+        let mut dest = (0, 0);
         let mut displacement = (0, 0);
         match action {
             Action::Exit => break,
-            Action::Move(dr) => displacement = dr,
+            Action::Move(dr) => {
+                displacement = dr;
+                dest = (player.x + dr.0, player.y + dr.1);
+            },
             Action::Fullscreen => {
                 let fullscreen = root.is_fullscreen();
                 root.set_fullscreen(!fullscreen);
             },
             _ => {}
         }
-        if !game_map.is_blocked(player.x + displacement.0, player.y + displacement.1) {
-            player.move_entity(displacement);
-            fov_recompute = true;
+        if game_state == GameStates::EnemyTurn {
+            for entity in entities.iter() {
+                println!("The {} ponders the meaning of its existence.", entity.name);
+            }
+
+            game_state = GameStates::PlayersTurn;
+        }
+        if !game_map.is_blocked(dest.0, dest.1) && game_state == GameStates::PlayersTurn {
+            let target = get_blocking_entities_at_location(&entities, dest.0, dest.1);
+            match target {
+                Some(ref m) => println!("You kick the {} in the shins, much to its annoyance!", m.name),
+                None => {
+                    player.move_entity(displacement);
+                    fov_recompute = true;
+                }
+            }
+
+            game_state = GameStates::EnemyTurn;
         }
     }
 }
