@@ -4,7 +4,8 @@ pub struct Tile {
     pub blocked: bool,
     pub block_sight: bool,
     pub x: i32,
-    pub y: i32
+    pub y: i32,
+    pub explored: bool
 }
 
 impl Tile {
@@ -12,6 +13,7 @@ impl Tile {
         let mut ret = Tile::default();
         ret.blocked = blocked;
         ret.block_sight = blocked;
+        ret.explored = false;
 
         ret
     }
