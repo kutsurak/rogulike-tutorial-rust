@@ -4,14 +4,13 @@ extern crate rand;
 use tcod::{RootConsole, FontLayout};
 use tcod::colors;
 
-mod input;
+mod engine;
 mod entity;
-mod render_functions;
 mod map_objects;
 
-use input::{Action, handle_input};
+use engine::input::{Action, handle_input};
 use entity::{Entity};
-use render_functions::{render_all, clear_all};
+use engine::render_functions::{render_all, clear_all};
 use map_objects::game_map::GameMap;
 
 fn main() {
