@@ -10,6 +10,7 @@ use tcod::colors;
 mod engine;
 mod entity;
 mod map_objects;
+mod components;
 
 use engine::fov_functions::{initialize_fov, recompute_fov};
 use engine::game_states::GameStates;
@@ -17,6 +18,8 @@ use engine::input::{Action, handle_input};
 use engine::render_functions::{render_all, clear_all};
 use entity::{Entity, get_blocking_entities_at_location};
 use map_objects::game_map::GameMap;
+use components::ai::BasicMonster;
+use components::fighter::Fighter;
 
 fn main() {
     let screen_width = 80;
@@ -40,8 +43,10 @@ fn main() {
     colors.insert(String::from("light_wall"), colors::Color::new(130, 110, 50));
     colors.insert(String::from("light_ground"), colors::Color::new(200, 180, 50));
 
+    let fighter_component = Fighter::new(30, 2, 5);
     let mut player = Entity::new(0, 0, '@', colors::WHITE,
-                                 "Player".to_string(), true);
+                                 "Player".to_string(), true,
+                                 fighter_component);
 
     let mut entities = Vec::new();
 
@@ -97,7 +102,9 @@ fn main() {
         }
         if game_state == GameStates::EnemyTurn {
             for entity in entities.iter() {
-                println!("The {} ponders the meaning of its existence.", entity.name);
+                //println!("The {} ponders the meaning of its existence.", entity.name);
+                let mut en = entity.clone();
+                en.take_turn(&player, &fov_map, &game_map, &entities);
             }
 
             game_state = GameStates::PlayersTurn;
