@@ -9,7 +9,7 @@ use map_objects::game_map::GameMap;
 use components::ai::BasicMonster;
 use components::fighter::Fighter;
 
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub struct Entity {
     pub x: i32,
     pub y: i32,

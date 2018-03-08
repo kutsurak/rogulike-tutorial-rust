@@ -100,15 +100,19 @@ fn main() {
             },
             _ => {}
         }
+
+        let mut new_entities: Vec<Entity> = Vec::new();
         if game_state == GameStates::EnemyTurn {
             for entity in entities.iter() {
                 //println!("The {} ponders the meaning of its existence.", entity.name);
                 let mut en = entity.clone();
                 en.take_turn(&player, &fov_map, &game_map, &entities);
+                new_entities.push(en);
             }
 
             game_state = GameStates::PlayersTurn;
         }
+        let entities = new_entities;
         if !game_map.is_blocked(dest.0, dest.1) && game_state == GameStates::PlayersTurn {
             let target = get_blocking_entities_at_location(&entities, dest.0, dest.1);
             match target {

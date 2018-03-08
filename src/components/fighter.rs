@@ -1,4 +1,4 @@
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Fighter {
     pub max_hp: i32,
     pub hp: i32,
