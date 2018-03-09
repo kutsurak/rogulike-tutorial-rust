@@ -101,18 +101,24 @@ fn main() {
             _ => {}
         }
 
-        let mut new_entities: Vec<Entity> = Vec::new();
+        // let mut new_entities: Vec<Entity> = Vec::new();
         if game_state == GameStates::EnemyTurn {
-            for entity in entities.iter() {
-                //println!("The {} ponders the meaning of its existence.", entity.name);
-                let mut en = entity.clone();
-                en.take_turn(&player, &fov_map, &game_map, &entities);
-                new_entities.push(en);
+            let entity_number = entities.len();
+            let mut cnt = 0;
+            let mut tmp_entities = Vec::new();
+            while cnt < entity_number {
+                let mut entity = match entities.pop() {
+                    Some(en) => en,
+                    None => continue
+                };
+                entity.take_turn(&player, &fov_map, &game_map, &entities);
+                tmp_entities.push(entity);
+                cnt += 1;
             }
-
+            entities.append(&mut tmp_entities);
             game_state = GameStates::PlayersTurn;
         }
-        let entities = new_entities;
+        // let entities = new_entities;
         if !game_map.is_blocked(dest.0, dest.1) && game_state == GameStates::PlayersTurn {
             let target = get_blocking_entities_at_location(&entities, dest.0, dest.1);
             match target {
